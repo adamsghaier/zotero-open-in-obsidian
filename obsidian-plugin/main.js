@@ -10,8 +10,9 @@
  *     to the front; with several, the one used most recently;
  *   - otherwise opens it in a new tab.
  *
- * The other way round: right-click a literature note in the file explorer (left
- * sidebar) → "Open in Zotero" opens its PDF in Zotero. It opens the same
+ * The other way round (switched OFF, see OPEN_IN_ZOTERO_MENU below): right-click a
+ * literature note in the file explorer (left sidebar) → "Open in Zotero" opens its
+ * PDF in Zotero. It opens the same
  * zotero://open-pdf link as the note's own "Open PDF" link, the same way Obsidian
  * opens that link, so it behaves identically. Only shown for notes whose PDF
  * property holds such a link; notes without a PDF, and other notes, get nothing.
@@ -20,6 +21,11 @@
  */
 
 const { Plugin, TFile, Notice, normalizePath } = require("obsidian");
+
+// "Open in Zotero" in a literature note's file-explorer menu. Built and working, but
+// switched off on 2026-09-30 at Adam's request; the code is kept. Set to true to
+// bring it back.
+const OPEN_IN_ZOTERO_MENU = false;
 
 // The zotero://open-pdf URL in a note's PDF property, e.g.
 // PDF: "[Open PDF](zotero://open-pdf/library/items/ABCD1234)", or null.
@@ -40,7 +46,7 @@ module.exports = class OpenFromZotero extends Plugin {
       });
     });
 
-    this.registerEvent(this.app.workspace.on("file-menu", (menu, file, source) => {
+    if (OPEN_IN_ZOTERO_MENU) this.registerEvent(this.app.workspace.on("file-menu", (menu, file, source) => {
       if (source !== "file-explorer-context-menu" || !(file instanceof TFile) || file.extension !== "md") return;
       const cache = this.app.metadataCache.getFileCache(file);
       const url = pdfURL(cache && cache.frontmatter);
