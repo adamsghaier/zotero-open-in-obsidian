@@ -23,8 +23,7 @@
 const { Plugin, TFile, Notice, normalizePath } = require("obsidian");
 
 // "Open in Zotero" in a literature note's file-explorer menu. Built and working, but
-// switched off on 2026-09-30 at Adam's request; the code is kept. Set to true to
-// bring it back.
+// switched off on 2026-09-30; the code is kept. Set to true to bring it back.
 const OPEN_IN_ZOTERO_MENU = false;
 
 // The zotero://open-pdf URL in a note's PDF property, e.g.
