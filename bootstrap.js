@@ -9,6 +9,11 @@
  * (obsidian.json), and the note is looked for in each vault's root and top-level
  * folders. The folder it's found in is remembered, so later lookups are one check.
  *
+ * If the vault has the companion Obsidian plugin "Open from Zotero" switched on
+ * (obsidian-plugin/ in this repo), the link goes through it instead: a note that's
+ * already open, in any tab or window, is brought to the front rather than opened
+ * again. Without it, the note always opens in a new tab.
+ *
  * Read-only: it never writes into a vault, and it only launches a link for a note
  * that exists, so Obsidian never gets asked for a file it would have to make up.
  * If the paper has a citekey but no note yet (just added, or held as a duplicate),
@@ -52,19 +57,23 @@ function exists(path) {
   }
 }
 
-// Absolute paths of every vault Obsidian knows about. Synchronous: it runs while
-// the context menu is opening.
-function vaultPaths() {
+// Every vault Obsidian knows about, as {id, path}. Synchronous: it runs while the
+// context menu is opening.
+function vaults() {
   let file = registryPath();
   if (!exists(file)) return [];
   try {
-    let vaults = JSON.parse(Zotero.File.getContents(file)).vaults || {};
-    return Object.values(vaults).map(v => v.path).filter(p => p && exists(p));
+    let registry = JSON.parse(Zotero.File.getContents(file)).vaults || {};
+    return Object.entries(registry).map(([id, v]) => ({ id, path: v.path })).filter(v => v.path && exists(v.path));
   }
   catch (e) {
     Zotero.logError(e);
     return [];
   }
+}
+
+function vaultPaths() {
+  return vaults().map(v => v.path);
 }
 
 function subfolders(dir) {
@@ -108,7 +117,34 @@ function findNote(citekey) {
   return null;
 }
 
-// path= lets Obsidian pick the vault itself; paneType=tab keeps the current note open.
+const COMPANION = "open-from-zotero";
+
+// True if the companion plugin is installed and switched on in this vault.
+function hasCompanion(vaultPath) {
+  let config = PathUtils.join(vaultPath, ".obsidian");
+  let enabled = PathUtils.join(config, "community-plugins.json");
+  if (!exists(PathUtils.join(config, "plugins", COMPANION, "main.js")) || !exists(enabled)) return false;
+  try {
+    return JSON.parse(Zotero.File.getContents(enabled)).includes(COMPANION);
+  }
+  catch (e) {
+    Zotero.logError(e);
+    return false;
+  }
+}
+
+// The link for a note. Through the companion when the vault has it: vault ID plus
+// the vault-relative path. Otherwise Obsidian's own open: path= lets Obsidian pick
+// the vault itself, and paneType=tab keeps the current note open.
+function noteURL(path) {
+  let vault = vaults().find(v => isInside(path, v.path));
+  if (vault && hasCompanion(vault.path)) {
+    let rel = PathUtils.normalize(path).slice(PathUtils.normalize(vault.path).length + 1).replace(/\\/g, "/");
+    return `obsidian://${COMPANION}?vault=${encodeURIComponent(vault.id)}&file=${encodeURIComponent(rel)}`;
+  }
+  return "obsidian://open?path=" + encodeURIComponent(path) + "&paneType=tab";
+}
+
 //
 // Zotero.launchURL() hands non-web links to Gecko's external-protocol service,
 // which asks "Open this link with Obsidian?" every time. Launching through the
@@ -117,8 +153,8 @@ function findNote(citekey) {
 // obsidian:// links in Zotero still ask as before. If this fails, it falls back to
 // launchURL, so the note still opens (after the question).
 function openNote(path) {
-  let url = "obsidian://open?path=" + encodeURIComponent(path) + "&paneType=tab";
-  log("opening " + path);
+  let url = noteURL(path);
+  log("opening " + url);
   try {
     if (!Zotero.isWin) Zotero.Utilities.Internal.Environment.clearMozillaVariables();
     let svc = Cc["@mozilla.org/uriloader/external-protocol-service;1"].getService(Ci.nsIExternalProtocolService);

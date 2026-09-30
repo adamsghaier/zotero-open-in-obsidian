@@ -1,7 +1,7 @@
 # Open in Obsidian for Zotero
 
-Right-click a paper → **Open in Obsidian** opens its literature note in a new
-Obsidian tab. It works on the paper itself, its PDF, or a note under it.
+Right-click a paper → **Open in Obsidian** opens its literature note in Obsidian:
+in a new tab, or, with the companion plugin below, in the tab or window where it's already open. It works on the paper itself, its PDF, or a note under it.
 
 The note is found by the paper's Better BibTeX citekey: `<citekey>.md`, which is the
 name the [Obsidian Zotero Integration](https://github.com/mgmeyers/obsidian-zotero-desktop-connector)
@@ -17,6 +17,18 @@ plugin gives it by default.
 
 Needs Better BibTeX (for the citekey) and Obsidian installed on the same computer.
 Works on macOS, Windows and Linux. Zotero 8–10.
+
+## Already-open notes: the companion Obsidian plugin
+
+Obsidian's own links always open a new tab, even if the note is already open. For
+Obsidian to switch to the open note instead, in whichever tab or window it's in, install
+the small companion plugin in `obsidian-plugin/`:
+
+1. Copy `manifest.json` and `main.js` into `<your vault>/.obsidian/plugins/open-from-zotero/`.
+2. In Obsidian: **Settings → Community plugins**, turn on **Open from Zotero**.
+
+Open in Obsidian notices it and uses it from then on. Without it, notes open in a new
+tab as before.
 
 ## Install
 Download `open-in-obsidian.xpi` from the latest [release](../../releases/latest), then in
