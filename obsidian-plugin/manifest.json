@@ -1,9 +1,9 @@
 {
   "id": "open-from-zotero",
   "name": "Open from Zotero",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "1.7.2",
-  "description": "Companion to the Zotero plugin Open in Obsidian: switches to a note that's already open (in any tab or window) instead of opening it again.",
+  "description": "Companion to the Zotero plugin Open in Obsidian: switches to a note that's already open (in any tab or window) instead of opening it again, and adds Open in Zotero to a literature note's file-explorer menu.",
   "author": "Adam Sghaier",
   "isDesktopOnly": true
 }

@@ -30,6 +30,11 @@ the small companion plugin in `obsidian-plugin/`:
 Open in Obsidian notices it and uses it from then on. Without it, notes open in a new
 tab as before.
 
+The companion also works the other way round: right-click a literature note in
+Obsidian's file explorer → **Open in Zotero** opens its PDF in Zotero. It uses the
+`zotero://open-pdf/…` link in the note's `PDF` property, so it only appears on notes
+that have a PDF.
+
 ## Install
 Download `open-in-obsidian.xpi` from the latest [release](../../releases/latest), then in
 Zotero: **Tools → Plugins → ⚙ → Install Plugin From File…**. Updates arrive through
