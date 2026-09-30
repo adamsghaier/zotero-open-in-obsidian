@@ -1,3 +1,18 @@
 {
-  "addons": {}
+  "addons": {
+    "open-in-obsidian@adamsghaier.local": {
+      "updates": [
+        {
+          "version": "1.1.0",
+          "update_link": "https://github.com/adamsghaier/zotero-open-in-obsidian/releases/download/v1.1.0/open-in-obsidian.xpi",
+          "update_hash": "sha256:cdd3820c1298f5749b504ee799bd2a1d622eb712dba54a277ff378979dee952e",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "8.0"
+            }
+          }
+        }
+      ]
+    }
+  }
 }
