@@ -109,9 +109,27 @@ function findNote(citekey) {
 }
 
 // path= lets Obsidian pick the vault itself; paneType=tab keeps the current note open.
+//
+// Zotero.launchURL() hands non-web links to Gecko's external-protocol service,
+// which asks "Open this link with Obsidian?" every time. Launching through the
+// scheme's handler with the system default, the way Zotero opens web links in the
+// browser, skips that question. Nothing is saved to Zotero's settings: the other
+// obsidian:// links in Zotero still ask as before. If this fails, it falls back to
+// launchURL, so the note still opens (after the question).
 function openNote(path) {
+  let url = "obsidian://open?path=" + encodeURIComponent(path) + "&paneType=tab";
   log("opening " + path);
-  Zotero.launchURL("obsidian://open?path=" + encodeURIComponent(path) + "&paneType=tab");
+  try {
+    if (!Zotero.isWin) Zotero.Utilities.Internal.Environment.clearMozillaVariables();
+    let svc = Cc["@mozilla.org/uriloader/external-protocol-service;1"].getService(Ci.nsIExternalProtocolService);
+    let handler = svc.getProtocolHandlerInfo("obsidian");
+    handler.preferredAction = Ci.nsIHandlerInfo.useSystemDefault;
+    handler.launchWithURI(Services.io.newURI(url), null);
+  }
+  catch (e) {
+    Zotero.logError(e);
+    Zotero.launchURL(url);
+  }
 }
 
 function install() {}
